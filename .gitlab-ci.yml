@@ -1,0 +1,16 @@
+stages:         
+  - deploy-staging
+
+services:
+  - docker:dind
+
+docker_build:
+  stage: deploy-staging
+  only:
+    - main
+  tags:
+    - docker-deploy
+  script:
+    - docker build -t ocr-service-staging:latest .
+    - docker rm -f ocr-service-staging || true
+    - docker run -d --name ocr-service-staging --restart always -p 8039:8000 -e AITD_API_URL=http://192.168.60.115:8085 -e LOG_FILE=logs/app.log -e REDIS_HOST=192.168.60.115 -e REDIS_PORT=8800 -e HOST=0.0.0.0 -e PORT=8000 -e MONGO_CONN_STR="mongodb://user:pass@192.168.60.115:8802/?authMechanism=DEFAULT" -e MONGO_DB_NAME=ocr-engine -w /ocr-engine-backend-service ocr-service-staging python3 main.py

@@ -8,9 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 
-from utils import env_config as config
-from utils.logger import init_logger
+from app.utils import env_config as config
+from app.utils.logger import init_logger
 
+from app.endpoints import water_meter
+from app.endpoints import account
 
 logger = init_logger(__name__)
 
@@ -22,7 +24,7 @@ if __name__ == "main":
 
 app = FastAPI(
     title=config.PROJECT_NAME,
-    description="Ai Engine Backend is a REST API service for managing the Ai Engine.",
+    description="OCR Engine Backend is a REST API service for managing the OCR Engine.",
     version=config.RELEASE_VERSION,
     docs_url="/docs",
     redoc_url=None,
@@ -47,6 +49,10 @@ app.add_middleware(
 # Request Logger Middleware
 # Log all requests with their response status code and time taken to process the request.
 # ignores websocket requests internally
+
+# fastapi routers
+app.include_router(water_meter.router, tags=["water_meter"])
+app.include_router(account.router, tags=["account"])
 # mount assets
 # assets.mount_assets(app, prefix="/assets")
 
